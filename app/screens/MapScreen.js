@@ -81,7 +81,7 @@ class MapScreen extends React.Component {
         <MapView
           style={{ flex: 1 }}
           region={isLoading ? region : this.regionFrom(region.latitude, region.longitude, 5000)}
-          onRegionChangeComplete={this.onRegionChangeComplete}
+          // onRegionChangeComplete={this.onRegionChangeComplete}
           showsUserLocation={true}
           showsMyLocationButton={true}
           followsUserLocation
