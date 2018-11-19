@@ -4,6 +4,8 @@ import { MapView } from 'expo';
 import { Button } from 'react-native-elements';
 import { connect } from 'react-redux';
 
+import * as actions from '../actions';
+
 class MapScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     headerTitle: 'Map Screen'
@@ -21,7 +23,14 @@ class MapScreen extends React.Component {
   };
   componentDidMount() {
     this.getCurrentLocation();
+    this.loadStations();
   }
+
+  loadStations = () => {
+    this.props.fetchStations(() => {
+      console.log(this.props.stations);
+    });
+  };
 
   onRegionChangeComplete = region => {
     this.setState({ region });
@@ -84,7 +93,6 @@ class MapScreen extends React.Component {
           // onRegionChangeComplete={this.onRegionChangeComplete}
           showsUserLocation={true}
           showsMyLocationButton={true}
-          followsUserLocation
         />
       </View>
     );
@@ -103,4 +111,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   }
 });
-export default MapScreen;
+
+function mapStateToProps({ stations }) {
+  return { stations: stations };
+}
+export default connect(
+  mapStateToProps,
+  actions
+)(MapScreen);
