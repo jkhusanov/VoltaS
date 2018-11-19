@@ -97,11 +97,10 @@ class MapScreen extends React.Component {
           {this.props.stations.map(station => (
             <MapView.Marker
               key={station.id}
-              coordinate={this.regionFrom(
-                station.location.coordinates[1],
-                station.location.coordinates[0],
-                5000
-              )}
+              coordinate={{
+                latitude: station.location.coordinates[1],
+                longitude: station.location.coordinates[0]
+              }}
               title={station.name}
             />
           ))}
