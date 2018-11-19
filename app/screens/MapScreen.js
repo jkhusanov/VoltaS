@@ -28,7 +28,7 @@ class MapScreen extends React.Component {
 
   loadStations = () => {
     this.props.fetchStations(() => {
-      console.log(this.props.stations);
+      // console.log(this.props.stations);
     });
   };
 
@@ -93,7 +93,19 @@ class MapScreen extends React.Component {
           // onRegionChangeComplete={this.onRegionChangeComplete}
           showsUserLocation={true}
           showsMyLocationButton={true}
-        />
+        >
+          {this.props.stations.map(station => (
+            <MapView.Marker
+              key={station.id}
+              coordinate={this.regionFrom(
+                station.location.coordinates[1],
+                station.location.coordinates[0],
+                5000
+              )}
+              title={station.name}
+            />
+          ))}
+        </MapView>
       </View>
     );
   };
