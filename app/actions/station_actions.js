@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { FETCH_STATIONS } from './types';
 
-const STATIONS_ROOT_URL = 'https://api.voltaapi.com/v1/stations';
+const STATIONS_ROOT_URL = 'https://api.voltaapi.com/v1/stations?status=a';
 
 export const fetchStations = callback => async dispatch => {
   try {

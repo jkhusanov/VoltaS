@@ -1,10 +1,21 @@
 import React from 'react';
-import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions
+} from 'react-native';
 import { MapView } from 'expo';
 import { Button } from 'react-native-elements';
 import { connect } from 'react-redux';
+import Modal from 'react-native-modal';
 
 import * as actions from '../actions';
+
+const { width } = Dimensions.get('window');
 
 class MapScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
@@ -14,6 +25,9 @@ class MapScreen extends React.Component {
   state = {
     mapLoaded: false,
     isLoading: true,
+    isModalVisible: false,
+    distance: 5000,
+    stationInfo: '',
     region: {
       latitude: null || 37.0902,
       longitude: null || -95.7129,
@@ -78,8 +92,11 @@ class MapScreen extends React.Component {
       longitudeDelta
     });
   }
+
+  _toggleModal = () => this.setState({ isModalVisible: !this.state.isModalVisible });
+
   contentView = () => {
-    const { region, mapLoaded, isLoading } = this.state;
+    const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
     if (mapLoaded) {
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <ActivityIndicator size='large' />
@@ -89,7 +106,7 @@ class MapScreen extends React.Component {
       <View style={{ flex: 1 }}>
         <MapView
           style={{ flex: 1 }}
-          region={isLoading ? region : this.regionFrom(region.latitude, region.longitude, 5000)}
+          region={isLoading ? region : this.regionFrom(region.latitude, region.longitude, distance)} //3rd arg smaller  = more closer distance
           // onRegionChangeComplete={this.onRegionChangeComplete}
           showsUserLocation={true}
           showsMyLocationButton={true}
@@ -101,10 +118,35 @@ class MapScreen extends React.Component {
                 latitude: station.location.coordinates[1],
                 longitude: station.location.coordinates[0]
               }}
-              title={station.name}
+              // title={station.name}
+              onPress={() => {
+                this.setState({
+                  region: {
+                    latitude: station.location.coordinates[1],
+                    longitude: station.location.coordinates[0]
+                  },
+                  distance: 250,
+                  stationInfo: station
+                }),
+                  this._toggleModal();
+              }}
             />
           ))}
         </MapView>
+
+        <Modal
+          isVisible={this.state.isModalVisible}
+          style={styles.bottomModal}
+          backdropColor={'transparent'}
+          onBackdropPress={this._toggleModal}
+        >
+          <View style={styles.modalContent}>
+            <Text>{stationInfo.name}</Text>
+            <TouchableOpacity onPress={this._toggleModal}>
+              <Text>Hide me!</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
       </View>
     );
   };
@@ -120,6 +162,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  customView: {
+    width: 140,
+    height: 100
+  },
+  bottomModal: {
+    justifyContent: 'flex-end',
+    margin: 0
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    marginBottom: 100
   }
 });
 
