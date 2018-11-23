@@ -6,20 +6,25 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
-  Dimensions
+  Dimensions,
+  Platform,
+  YellowBox
 } from 'react-native';
 import { MapView } from 'expo';
 import { Button } from 'react-native-elements';
 import { connect } from 'react-redux';
-import Modal from 'react-native-modal';
+import Modal from 'react-native-modalbox';
+import openMap from 'react-native-open-maps';
+import { AntDesign } from '@expo/vector-icons';
 
 import * as actions from '../actions';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+YellowBox.ignoreWarnings(['Require cycle: node_modules/react-native-gesture-handler']);
 
 class MapScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
-    headerTitle: 'Map Screen'
+    headerTitle: 'VoltaS'
   });
 
   state = {
@@ -28,6 +33,7 @@ class MapScreen extends React.Component {
     isModalVisible: false,
     distance: 5000,
     stationInfo: '',
+    isOpen: false,
     region: {
       latitude: null || 37.0902,
       longitude: null || -95.7129,
@@ -94,8 +100,13 @@ class MapScreen extends React.Component {
   }
 
   _toggleModal = () => this.setState({ isModalVisible: !this.state.isModalVisible });
-
-  contentView = () => {
+  gotoStation = (street, city, state, zip) => {
+    openMap({
+      travelType: ['drive'],
+      end: `${street}, ${city}, ${state}, ${zip}`
+    });
+  };
+  contentView() {
     const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
     if (mapLoaded) {
       <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -126,30 +137,49 @@ class MapScreen extends React.Component {
                     longitude: station.location.coordinates[0]
                   },
                   distance: 250,
-                  stationInfo: station
-                }),
-                  this._toggleModal();
+                  stationInfo: station,
+                  isOpen: true
+                });
               }}
             />
           ))}
         </MapView>
 
         <Modal
-          isVisible={this.state.isModalVisible}
-          style={styles.bottomModal}
-          backdropColor={'transparent'}
-          onBackdropPress={this._toggleModal}
+          isOpen={this.state.isOpen}
+          onClosed={() => this.setState({ isOpen: false })}
+          style={styles.modal}
+          backdrop={false}
+          position={'bottom'}
+          swipeToClose={true}
+          swipeThreshold={25}
         >
           <View style={styles.modalContent}>
-            <Text>{stationInfo.name}</Text>
-            <TouchableOpacity onPress={this._toggleModal}>
-              <Text>Hide me!</Text>
-            </TouchableOpacity>
+            <View style={styles.closeModal}>
+              <AntDesign name='minus' size={Platform.OS === 'ios' ? 55 : 60} />
+            </View>
+            <View style={styles.stationInfoStyle}>
+              <Text style={styles.stationName}>{stationInfo.name}</Text>
+              <Text style={styles.stationStatus}>{stationInfo.status}</Text>
+              <Button
+                title='Directions'
+                buttonStyle={styles.directionsButton}
+                onPress={() =>
+                  this.gotoStation(
+                    stationInfo.street_address,
+                    stationInfo.city,
+                    stationInfo.state,
+                    stationInfo.zip_code
+                  )
+                }
+                titleStyle={styles.buttonTitle}
+              />
+            </View>
           </View>
         </Modal>
       </View>
     );
-  };
+  }
   render() {
     const { isLoading } = this.state;
 
@@ -163,22 +193,51 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  customView: {
-    width: 140,
-    height: 100
-  },
-  bottomModal: {
-    justifyContent: 'flex-end',
-    margin: 0
+  modal: {
+    height: height / 6 + 15,
+    backgroundColor: 'transparent'
   },
   modalContent: {
+    flex: 1,
     backgroundColor: 'white',
-    padding: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-    marginBottom: 100
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+    borderColor: 'white',
+    borderTopWidth: 1
+  },
+
+  closeModal: {
+    position: 'absolute',
+    paddingBottom: height / 7
+  },
+
+  stationInfoStyle: {
+    alignItems: 'center'
+  },
+  locationTextContainer: {
+    paddingHorizontal: 10
+  },
+  directionsButton: {
+    backgroundColor: '#ff165d', // or 157EFB
+    width: 250,
+    height: height / 18 + 5,
+    borderColor: 'transparent',
+    borderWidth: 0,
+    borderRadius: 10
+  },
+  buttonTitle: {
+    fontWeight: '700',
+    color: 'white'
+  },
+  stationName: {
+    fontWeight: '700',
+    fontSize: 20
+  },
+  stationStatus: {
+    fontSize: 18,
+    color: '#0CE89C'
   }
 });
 
