@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Platform, ScrollView, StyleSheet } from 'react-native';
 import { Button, Card } from 'react-native-elements';
+import { connect } from 'react-redux';
 
 class SavedScreen extends React.Component {
   state = {
@@ -24,6 +25,7 @@ class SavedScreen extends React.Component {
     }
   });
   render() {
+    console.log(this.props.savedStations);
     return (
       <View style={styles.container}>
         <Text>Saved Stations Screen</Text>
@@ -41,4 +43,8 @@ const styles = StyleSheet.create({
   }
 });
 
-export default SavedScreen;
+function mapStateToProps(state) {
+  return { savedStations: state.savedStations };
+}
+
+export default connect(mapStateToProps)(SavedScreen);

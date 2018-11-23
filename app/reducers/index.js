@@ -1,3 +1,3 @@
 import stations from './stations_reducer';
-
-export default { stations };
+import savedStations from './saves_reducer';
+export default { stations, savedStations };

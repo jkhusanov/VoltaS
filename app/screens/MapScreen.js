@@ -161,6 +161,9 @@ class MapScreen extends React.Component {
             <View style={styles.stationInfoStyle}>
               <Text style={styles.stationName}>{stationInfo.name}</Text>
               <Text style={styles.stationStatus}>{stationInfo.status}</Text>
+              <TouchableOpacity onPress={() => this.props.saveStation(stationInfo)}>
+                <Text>Save</Text>
+              </TouchableOpacity>
               <Button
                 title='Directions'
                 buttonStyle={styles.directionsButton}
