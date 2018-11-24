@@ -6,8 +6,8 @@
 - [x] Implement modal for stations info
 - [x] Implement directions to a station
 - [x] Implement save station option
-- [ ] Improve station info modal on MapScreen
-  - [ ] Add star or station button for save
+- [x] Improve station info modal on MapScreen
+  - [x] Add star or bookmark button for save
 - [ ] Improve station info card on SavedScreen
   - [ ] Maybe Show the address
   - [ ] Maybe add individual station deletion option

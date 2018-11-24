@@ -15,7 +15,7 @@ import { Button } from 'react-native-elements';
 import { connect } from 'react-redux';
 import Modal from 'react-native-modalbox';
 import openMap from 'react-native-open-maps';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Feather, Entypo } from '@expo/vector-icons';
 
 import * as actions from '../actions';
 
@@ -161,22 +161,44 @@ class MapScreen extends React.Component {
             <View style={styles.stationInfoStyle}>
               <Text style={styles.stationName}>{stationInfo.name}</Text>
               <Text style={styles.stationStatus}>{stationInfo.status}</Text>
-              <TouchableOpacity onPress={() => this.props.saveStation(stationInfo)}>
-                <Text>Save</Text>
-              </TouchableOpacity>
-              <Button
-                title='Directions'
-                buttonStyle={styles.directionsButton}
-                onPress={() =>
-                  this.gotoStation(
-                    stationInfo.street_address,
-                    stationInfo.city,
-                    stationInfo.state,
-                    stationInfo.zip_code
-                  )
-                }
-                titleStyle={styles.buttonTitle}
-              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  width: 250
+                }}
+              >
+                <TouchableOpacity onPress={() => this.props.saveStation(stationInfo)}>
+                  <View style={styles.saveButton}>
+                    <Feather
+                      name='bookmark'
+                      size={Platform.OS === 'ios' ? 20 : 22}
+                      style={styles.buttonIconStyle}
+                    />
+                    <Text style={[styles.buttonTitle, { color: 'black', fontSize: 16 }]}>Save</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    this.gotoStation(
+                      stationInfo.street_address,
+                      stationInfo.city,
+                      stationInfo.state,
+                      stationInfo.zip_code
+                    )
+                  }
+                >
+                  <View style={styles.directionsButton}>
+                    <Entypo
+                      name='direction'
+                      size={Platform.OS === 'ios' ? 20 : 22}
+                      style={styles.buttonIconStyle}
+                      color='white'
+                    />
+                    <Text style={styles.buttonTitle}>Go</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
@@ -222,17 +244,35 @@ const styles = StyleSheet.create({
   locationTextContainer: {
     paddingHorizontal: 10
   },
+  saveButton: {
+    flexDirection: 'row',
+    backgroundColor: 'white', // or 157EFB
+    width: 100,
+    height: height / 18 + 5,
+    borderColor: '#ff165d',
+    borderWidth: 0.5,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   directionsButton: {
+    flexDirection: 'row',
     backgroundColor: '#ff165d', // or 157EFB
-    width: 250,
+    width: 100,
     height: height / 18 + 5,
     borderColor: 'transparent',
     borderWidth: 0,
-    borderRadius: 10
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   buttonTitle: {
     fontWeight: '700',
-    color: 'white'
+    color: 'white',
+    fontSize: 20
+  },
+  buttonIconStyle: {
+    marginRight: 10
   },
   stationName: {
     fontWeight: '700',

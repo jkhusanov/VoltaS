@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
     height: height / 18 + 5,
     borderColor: 'transparent',
     borderWidth: 0,
-    borderRadius: 10
+    borderRadius: 10,
+    elevation: 0
   },
   buttonTitle: {
     fontWeight: '700',
