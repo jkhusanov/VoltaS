@@ -16,6 +16,7 @@ import { connect } from 'react-redux';
 import Modal from 'react-native-modalbox';
 import openMap from 'react-native-open-maps';
 import { AntDesign, Feather, Entypo } from '@expo/vector-icons';
+import ClusteredMapView from 'react-native-maps-super-cluster';
 
 import * as actions from '../actions';
 
