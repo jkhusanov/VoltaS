@@ -34,6 +34,7 @@ class MapScreen extends React.Component {
     distance: 5000,
     stationInfo: '',
     isOpen: false,
+    ready: true,
     region: {
       latitude: null || 37.0902,
       longitude: null || -95.7129,
@@ -57,7 +58,7 @@ class MapScreen extends React.Component {
     this.setState({ region });
   };
 
-  getCurrentLocation() {
+  getCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
       position => {
         if (position.coords.latitude && position.coords.longitude) {
@@ -78,8 +79,8 @@ class MapScreen extends React.Component {
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
-  }
-  regionFrom(lat, lon, distance) {
+  };
+  regionFrom = (lat, lon, distance) => {
     distance = distance / 2;
     const circumference = 40075;
     const oneDegreeOfLatitudeInMeters = 111.32 * 1000;
@@ -99,9 +100,8 @@ class MapScreen extends React.Component {
       latitudeDelta,
       longitudeDelta
     });
-  }
+  };
 
-  _toggleModal = () => this.setState({ isModalVisible: !this.state.isModalVisible });
   gotoStation = (street, city, state, zip) => {
     openMap({
       travelType: ['drive'],
@@ -114,8 +114,6 @@ class MapScreen extends React.Component {
       coordinate = cluster.coordinate,
       clusterId = cluster.clusterId;
 
-    // console.log(cluster);
-
     return (
       <MapView.Marker identifier={`cluster-${clusterId}`} coordinate={coordinate} onPress={onPress}>
         <View style={styles.clusterContainer}>
@@ -125,18 +123,12 @@ class MapScreen extends React.Component {
     );
   };
   renderMarker = pin => {
-    // console.log(pin);
     return (
       <MapView.Marker
         key={pin.value.id}
         coordinate={pin.location}
         onPress={() => {
           this.setState({
-            region: {
-              latitude: pin.value.location.coordinates[1],
-              longitude: pin.value.location.coordinates[0]
-            },
-            distance: 250,
             stationInfo: pin.value,
             isOpen: true
           });
@@ -145,105 +137,6 @@ class MapScreen extends React.Component {
     );
   };
 
-  contentView = () => {
-    const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
-    if (mapLoaded) {
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size='large' />
-      </View>;
-    }
-    return (
-      <View style={{ flex: 1 }}>
-        <MapView
-          style={{ flex: 1 }}
-          region={isLoading ? region : this.regionFrom(region.latitude, region.longitude, distance)} //3rd arg smaller  = more closer distance
-          // onRegionChangeComplete={this.onRegionChangeComplete}
-          showsUserLocation={true}
-          showsMyLocationButton={true}
-        >
-          {this.props.stations.map(station => (
-            <MapView.Marker
-              key={station.id}
-              coordinate={{
-                latitude: station.location.coordinates[1],
-                longitude: station.location.coordinates[0]
-              }}
-              // title={station.name}
-              onPress={() => {
-                this.setState({
-                  region: {
-                    latitude: station.location.coordinates[1],
-                    longitude: station.location.coordinates[0]
-                  },
-                  distance: 250,
-                  stationInfo: station,
-                  isOpen: true
-                });
-              }}
-            />
-          ))}
-        </MapView>
-
-        <Modal
-          isOpen={this.state.isOpen}
-          onClosed={() => this.setState({ isOpen: false })}
-          style={styles.modal}
-          backdrop={false}
-          position={'bottom'}
-          swipeToClose={true}
-          swipeThreshold={25}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.closeModal}>
-              <AntDesign name='minus' size={Platform.OS === 'ios' ? 55 : 60} />
-            </View>
-            <View style={styles.stationInfoStyle}>
-              <Text style={styles.stationName}>{stationInfo.name}</Text>
-              <Text style={styles.stationStatus}>{stationInfo.status}</Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  width: 250
-                }}
-              >
-                <TouchableOpacity onPress={() => this.props.saveStation(stationInfo)}>
-                  <View style={styles.saveButton}>
-                    <Feather
-                      name='bookmark'
-                      size={Platform.OS === 'ios' ? 20 : 22}
-                      style={styles.buttonIconStyle}
-                    />
-                    <Text style={[styles.buttonTitle, { color: 'black', fontSize: 16 }]}>Save</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    this.gotoStation(
-                      stationInfo.street_address,
-                      stationInfo.city,
-                      stationInfo.state,
-                      stationInfo.zip_code
-                    )
-                  }
-                >
-                  <View style={styles.directionsButton}>
-                    <Entypo
-                      name='direction'
-                      size={Platform.OS === 'ios' ? 20 : 22}
-                      style={styles.buttonIconStyle}
-                      color='white'
-                    />
-                    <Text style={styles.buttonTitle}>Go</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-    );
-  };
   stationInfoRender() {
     const { stationInfo, isOpen } = this.state;
     return (
@@ -324,10 +217,14 @@ class MapScreen extends React.Component {
     return results.features;
   }
 
-  clusteredMarkers = () => {
+  clusteredMarkers() {
     const data = this._convertPoints(this.props.stations);
     const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
-
+    if (mapLoaded) {
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size='large' />
+      </View>;
+    }
     return (
       <View style={styles.container} style={{ flex: 1 }}>
         <ClusteredMapView
@@ -335,18 +232,27 @@ class MapScreen extends React.Component {
           data={data}
           renderMarker={this.renderMarker.bind(this)}
           renderCluster={this.renderCluster.bind(this)}
-          initialRegion={
-            isLoading ? region : this.regionFrom(region.latitude, region.longitude, distance)
-          }
+          initialRegion={region}
+          // region={region}
+          // onRegionChange={this.onRegionChangeComplete}
           showsUserLocation={true}
           showsMyLocationButton={true}
+          maxZoom={16}
         />
         {this.stationInfoRender()}
       </View>
     );
-  };
+  }
   render() {
-    return <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>;
+    const { isLoading } = this.state;
+    // return <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>;
+    return isLoading === true ? (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size='large' />
+      </View>
+    ) : (
+      <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>
+    );
   }
 }
 const styles = StyleSheet.create({
