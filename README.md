@@ -8,6 +8,7 @@
 - [x] Implement save station option
 - [x] Improve station info modal on MapScreen
   - [x] Add star or bookmark button for save
+- [ ] Cluster markers
 - [ ] Improve station info card on SavedScreen
   - [ ] Maybe Show the address
   - [ ] Maybe add individual station deletion option

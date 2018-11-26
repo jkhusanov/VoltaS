@@ -27,7 +27,6 @@ class MapScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
     headerTitle: 'VoltaS'
   });
-
   state = {
     mapLoaded: false,
     isLoading: true,
@@ -42,6 +41,7 @@ class MapScreen extends React.Component {
       longitudeDelta: null || 60
     }
   };
+
   componentDidMount() {
     this.getCurrentLocation();
     this.loadStations();
@@ -61,6 +61,7 @@ class MapScreen extends React.Component {
     navigator.geolocation.getCurrentPosition(
       position => {
         if (position.coords.latitude && position.coords.longitude) {
+          console.log(position.coords.latitude, position.coords.longitude);
           this.setState({
             region: {
               latitude: position.coords.latitude,
@@ -107,7 +108,44 @@ class MapScreen extends React.Component {
       end: `${street}, ${city}, ${state}, ${zip}`
     });
   };
-  contentView() {
+
+  renderCluster = (cluster, onPress) => {
+    const pointCount = cluster.pointCount,
+      coordinate = cluster.coordinate,
+      clusterId = cluster.clusterId;
+
+    // console.log(cluster);
+
+    return (
+      <MapView.Marker identifier={`cluster-${clusterId}`} coordinate={coordinate} onPress={onPress}>
+        <View style={styles.clusterContainer}>
+          <Text style={styles.clusterText}>{pointCount}</Text>
+        </View>
+      </MapView.Marker>
+    );
+  };
+  renderMarker = pin => {
+    // console.log(pin);
+    return (
+      <MapView.Marker
+        key={pin.value.id}
+        coordinate={pin.location}
+        onPress={() => {
+          this.setState({
+            region: {
+              latitude: pin.value.location.coordinates[1],
+              longitude: pin.value.location.coordinates[0]
+            },
+            distance: 250,
+            stationInfo: pin.value,
+            isOpen: true
+          });
+        }}
+      />
+    );
+  };
+
+  contentView = () => {
     const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
     if (mapLoaded) {
       <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -205,20 +243,113 @@ class MapScreen extends React.Component {
         </Modal>
       </View>
     );
+  };
+  stationInfoRender() {
+    const { stationInfo, isOpen } = this.state;
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClosed={() => this.setState({ isOpen: false })}
+        style={styles.modal}
+        backdrop={false}
+        position={'bottom'}
+        swipeToClose={true}
+        swipeThreshold={25}
+      >
+        <View style={styles.modalContent}>
+          <View style={styles.closeModal}>
+            <AntDesign name='minus' size={Platform.OS === 'ios' ? 55 : 60} />
+          </View>
+          <View style={styles.stationInfoStyle}>
+            <Text style={styles.stationName}>{stationInfo.name}</Text>
+            <Text style={styles.stationStatus}>{stationInfo.status}</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: 250
+              }}
+            >
+              <TouchableOpacity onPress={() => this.props.saveStation(stationInfo)}>
+                <View style={styles.saveButton}>
+                  <Feather
+                    name='bookmark'
+                    size={Platform.OS === 'ios' ? 20 : 22}
+                    style={styles.buttonIconStyle}
+                  />
+                  <Text style={[styles.buttonTitle, { color: 'black', fontSize: 16 }]}>Save</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  this.gotoStation(
+                    stationInfo.street_address,
+                    stationInfo.city,
+                    stationInfo.state,
+                    stationInfo.zip_code
+                  )
+                }
+              >
+                <View style={styles.directionsButton}>
+                  <Entypo
+                    name='direction'
+                    size={Platform.OS === 'ios' ? 20 : 22}
+                    style={styles.buttonIconStyle}
+                    color='white'
+                  />
+                  <Text style={styles.buttonTitle}>Go</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
   }
-  render() {
-    const { isLoading } = this.state;
+  _convertPoints(data) {
+    const results = {
+      type: 'MapCollection',
+      features: []
+    };
+    data.map(value => {
+      array = {
+        value,
+        location: {
+          latitude: value.location.coordinates[1],
+          longitude: value.location.coordinates[0]
+        }
+      };
+      results.features.push(array);
+    });
+    return results.features;
+  }
 
-    return <View style={{ flex: 1 }}>{this.contentView()}</View>;
+  clusteredMarkers = () => {
+    const data = this._convertPoints(this.props.stations);
+    const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
+
+    return (
+      <View style={styles.container} style={{ flex: 1 }}>
+        <ClusteredMapView
+          style={{ flex: 1 }}
+          data={data}
+          renderMarker={this.renderMarker.bind(this)}
+          renderCluster={this.renderCluster.bind(this)}
+          initialRegion={
+            isLoading ? region : this.regionFrom(region.latitude, region.longitude, distance)
+          }
+          showsUserLocation={true}
+          showsMyLocationButton={true}
+        />
+        {this.stationInfoRender()}
+      </View>
+    );
+  };
+  render() {
+    return <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>;
   }
 }
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
   modal: {
     height: height / 6 + 15,
     backgroundColor: 'transparent'
@@ -282,6 +413,81 @@ const styles = StyleSheet.create({
   stationStatus: {
     fontSize: 18,
     color: '#0CE89C'
+  },
+
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5FCFF'
+  },
+  clusterContainer: {
+    width: 30,
+    height: 30,
+    padding: 6,
+    borderWidth: 1,
+    borderRadius: 15,
+    alignItems: 'center',
+    borderColor: '#65bc46',
+    justifyContent: 'center',
+    backgroundColor: 'white'
+  },
+  clusterText: {
+    fontSize: 13,
+    color: '#65bc46',
+    fontWeight: '500',
+    textAlign: 'center'
+  },
+  controlBar: {
+    top: 24,
+    left: 25,
+    right: 25,
+    height: 40,
+    borderRadius: 20,
+    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
+    justifyContent: 'space-between'
+  },
+  button: {
+    paddingVertical: 8,
+    paddingHorizontal: 20
+  },
+  novaLabLogo: {
+    right: 8,
+    bottom: 8,
+    width: 64,
+    height: 64,
+    position: 'absolute'
+  },
+  text: {
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  clusterContainer: {
+    width: 24,
+    height: 24,
+    borderWidth: 1,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderColor: '#65bc46',
+    justifyContent: 'center',
+    backgroundColor: '#fff'
+  },
+  counterText: {
+    fontSize: 14,
+    color: '#65bc46',
+    fontWeight: '400'
+  },
+  calloutStyle: {
+    width: 64,
+    height: 64,
+    padding: 8,
+    borderRadius: 8,
+    borderColor: '#65bc46',
+    backgroundColor: 'white'
   }
 });
 
