@@ -9,7 +9,7 @@
 - [x] Improve station info modal on MapScreen
   - [x] Add star or bookmark button for save
 - [x] Cluster markers
-  - [ ] Clusters render view change
+  - [x] Clusters render view change
 - [ ] Improve station info card on SavedScreen
   - [ ] Maybe Show the address
   - [ ] Maybe add individual station deletion option

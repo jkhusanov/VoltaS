@@ -145,32 +145,8 @@ class MapScreen extends React.Component {
           });
         }}
       >
-        <View
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: '50%, 50%, 50%, 0',
-            borderWidth: 1,
-            borderColor: '#ff165d',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'white',
-            transform: [{ rotate: '-45deg' }],
-            top: '40%',
-            left: '30%'
-          }}
-        >
-          <View
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: '#ff165d',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          />
+        <View style={styles.markerWrap}>
+          <View style={styles.markerCenter} />
         </View>
       </MapView.Marker>
     );
@@ -190,7 +166,7 @@ class MapScreen extends React.Component {
       >
         <View style={styles.modalContent}>
           <View style={styles.closeModal}>
-            <AntDesign name='minus' size={Platform.OS === 'ios' ? 55 : 60} />
+            <AntDesign name="minus" size={Platform.OS === 'ios' ? 55 : 60} />
           </View>
           <View style={styles.stationInfoStyle}>
             <Text style={styles.stationName}>{stationInfo.name}</Text>
@@ -205,7 +181,7 @@ class MapScreen extends React.Component {
               <TouchableOpacity onPress={() => this.props.saveStation(stationInfo)}>
                 <View style={styles.saveButton}>
                   <Feather
-                    name='bookmark'
+                    name="bookmark"
                     size={Platform.OS === 'ios' ? 20 : 22}
                     style={styles.buttonIconStyle}
                   />
@@ -224,10 +200,10 @@ class MapScreen extends React.Component {
               >
                 <View style={styles.directionsButton}>
                   <Entypo
-                    name='direction'
+                    name="direction"
                     size={Platform.OS === 'ios' ? 20 : 22}
                     style={styles.buttonIconStyle}
-                    color='white'
+                    color="white"
                   />
                   <Text style={styles.buttonTitle}>Go</Text>
                 </View>
@@ -261,7 +237,7 @@ class MapScreen extends React.Component {
     const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
     if (mapLoaded) {
       <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size='large' />
+        <ActivityIndicator size="large" />
       </View>;
     }
     return (
@@ -287,7 +263,7 @@ class MapScreen extends React.Component {
     // return <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>;
     return isLoading === true ? (
       <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size='large' />
+        <ActivityIndicator size="large" />
       </View>
     ) : (
       <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>
@@ -391,28 +367,33 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderRadius: 15,
     alignItems: 'center',
-    borderColor: '#87e5da',
+    borderColor: '#007991',
     justifyContent: 'center',
     backgroundColor: '#fff'
   },
   markerWrap: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 16,
+    borderColor: '#007991',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderWidth: 5,
+    width: 32,
+    height: 32,
+    transform: [{ rotate: '-45deg' }],
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: '#fff'
   },
-  ring: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(130,4,150, 0.3)',
-    position: 'absolute',
+  markerCenter: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'rgba(130,4,150, 0.5)'
-  },
-  marker: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(130,4,150, 0.9)'
+    borderColor: '#87e5da',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ff165d'
   }
 });
 
