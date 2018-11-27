@@ -62,7 +62,6 @@ class MapScreen extends React.Component {
     navigator.geolocation.getCurrentPosition(
       position => {
         if (position.coords.latitude && position.coords.longitude) {
-          console.log(position.coords.latitude, position.coords.longitude);
           this.setState({
             region: {
               latitude: position.coords.latitude,
@@ -117,7 +116,19 @@ class MapScreen extends React.Component {
     return (
       <MapView.Marker identifier={`cluster-${clusterId}`} coordinate={coordinate} onPress={onPress}>
         <View style={styles.clusterContainer}>
-          <Text style={styles.clusterText}>{pointCount}</Text>
+          <View
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: '#ff165d',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <Text style={styles.clusterText}>{pointCount}</Text>
+          </View>
         </View>
       </MapView.Marker>
     );
@@ -133,7 +144,35 @@ class MapScreen extends React.Component {
             isOpen: true
           });
         }}
-      />
+      >
+        <View
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: '50%, 50%, 50%, 0',
+            borderWidth: 1,
+            borderColor: '#ff165d',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white',
+            transform: [{ rotate: '-45deg' }],
+            top: '40%',
+            left: '30%'
+          }}
+        >
+          <View
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: '#ff165d',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          />
+        </View>
+      </MapView.Marker>
     );
   };
 
@@ -327,21 +366,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#F5FCFF'
   },
-  clusterContainer: {
-    width: 30,
-    height: 30,
-    padding: 6,
-    borderWidth: 1,
-    borderRadius: 15,
-    alignItems: 'center',
-    borderColor: '#65bc46',
-    justifyContent: 'center',
-    backgroundColor: 'white'
-  },
   clusterText: {
-    fontSize: 13,
-    color: '#65bc46',
-    fontWeight: '500',
+    fontSize: 14,
+    color: '#008276',
+    fontWeight: '700',
     textAlign: 'center'
   },
   controlBar: {
@@ -357,43 +385,34 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     justifyContent: 'space-between'
   },
-  button: {
-    paddingVertical: 8,
-    paddingHorizontal: 20
-  },
-  novaLabLogo: {
-    right: 8,
-    bottom: 8,
-    width: 64,
-    height: 64,
-    position: 'absolute'
-  },
-  text: {
-    fontSize: 16,
-    fontWeight: 'bold'
-  },
   clusterContainer: {
-    width: 24,
-    height: 24,
-    borderWidth: 1,
-    borderRadius: 12,
+    width: 30,
+    height: 30,
+    borderWidth: 4,
+    borderRadius: 15,
     alignItems: 'center',
-    borderColor: '#65bc46',
+    borderColor: '#87e5da',
     justifyContent: 'center',
     backgroundColor: '#fff'
   },
-  counterText: {
-    fontSize: 14,
-    color: '#65bc46',
-    fontWeight: '400'
+  markerWrap: {
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  calloutStyle: {
-    width: 64,
-    height: 64,
-    padding: 8,
-    borderRadius: 8,
-    borderColor: '#65bc46',
-    backgroundColor: 'white'
+  ring: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(130,4,150, 0.3)',
+    position: 'absolute',
+    borderWidth: 1,
+    borderColor: 'rgba(130,4,150, 0.5)'
+  },
+  marker: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(130,4,150, 0.9)'
   }
 });
 
