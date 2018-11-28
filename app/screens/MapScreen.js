@@ -15,7 +15,7 @@ import { Button } from 'react-native-elements';
 import { connect } from 'react-redux';
 import Modal from 'react-native-modalbox';
 import openMap from 'react-native-open-maps';
-import { AntDesign, Feather, Entypo } from '@expo/vector-icons';
+import { AntDesign, Feather, Entypo, FontAwesome } from '@expo/vector-icons';
 import ClusteredMapView from 'react-native-maps-super-cluster';
 
 import * as actions from '../actions';
@@ -116,17 +116,7 @@ class MapScreen extends React.Component {
     return (
       <MapView.Marker identifier={`cluster-${clusterId}`} coordinate={coordinate} onPress={onPress}>
         <View style={styles.clusterContainer}>
-          <View
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: 12,
-              borderWidth: 1,
-              borderColor: '#ff165d',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
+          <View style={styles.clusterRing}>
             <Text style={styles.clusterText}>{pointCount}</Text>
           </View>
         </View>
@@ -146,7 +136,14 @@ class MapScreen extends React.Component {
         }}
       >
         <View style={styles.markerWrap}>
-          <View style={styles.markerCenter} />
+          <View style={styles.markerCenter}>
+            <FontAwesome
+              name="bolt"
+              size={Platform.OS === 'ios' ? 10 : 11}
+              style={styles.boltIcon}
+              color="#26baee"
+            />
+          </View>
         </View>
       </MapView.Marker>
     );
@@ -166,7 +163,7 @@ class MapScreen extends React.Component {
       >
         <View style={styles.modalContent}>
           <View style={styles.closeModal}>
-            <AntDesign name="minus" size={Platform.OS === 'ios' ? 55 : 60} />
+            <AntDesign name="minus" size={Platform.OS === 'ios' ? 55 : 57} />
           </View>
           <View style={styles.stationInfoStyle}>
             <Text style={styles.stationName}>{stationInfo.name}</Text>
@@ -220,14 +217,16 @@ class MapScreen extends React.Component {
       features: []
     };
     data.map(value => {
-      array = {
-        value,
-        location: {
-          latitude: value.location.coordinates[1],
-          longitude: value.location.coordinates[0]
-        }
-      };
-      results.features.push(array);
+      if (value.site_id !== null) {
+        array = {
+          value,
+          location: {
+            latitude: value.location.coordinates[1],
+            longitude: value.location.coordinates[0]
+          }
+        };
+        results.features.push(array);
+      }
     });
     return results.features;
   }
@@ -367,14 +366,23 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderRadius: 15,
     alignItems: 'center',
-    borderColor: '#007991',
+    borderColor: '#26baee',
     justifyContent: 'center',
     backgroundColor: '#fff'
+  },
+  clusterRing: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#f47645',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   markerWrap: {
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 16,
-    borderColor: '#007991',
+    borderColor: '#26baee',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     borderWidth: 5,
@@ -383,17 +391,21 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-45deg' }],
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    marginBottom: Platform.OS === 'ios' ? 0 : 12
   },
   markerCenter: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#87e5da',
+    width: 15,
+    height: 15,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: '#f47645',
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ff165d'
+    alignItems: 'center'
+  },
+  boltIcon: {
+    alignSelf: 'center',
+    transform: [{ rotate: '45deg' }]
   }
 });
 

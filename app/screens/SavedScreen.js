@@ -4,6 +4,7 @@ import { Button, Card } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { MapView } from 'expo';
 import openMap from 'react-native-open-maps';
+import { FontAwesome } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -16,7 +17,7 @@ class SavedScreen extends React.Component {
     headerRight: (
       <Button
         onPress={() => navigation.navigate('Settings')}
-        title='Settings'
+        title="Settings"
         titleStyle={{ color: 'rgba(0, 122, 255, 1)' }}
         buttonStyle={{
           backgroundColor: 'rgba(0, 0, 0, 0)'
@@ -46,7 +47,15 @@ class SavedScreen extends React.Component {
       };
       return (
         <Card key={id} title={name} containerStyle={styles.cardStyle}>
-          <View style={{ height: height / 4 + 150 }}>
+          <View
+            style={{
+              height: height / 4 + 10,
+              borderRadius: 10,
+              borderWidth: 0.5,
+              borderColor: 'white',
+              overflow: 'hidden'
+            }}
+          >
             <MapView
               style={{ flex: 1 }}
               cacheEnabled={Platform.OS === 'ios'}
@@ -55,19 +64,34 @@ class SavedScreen extends React.Component {
               loadingEnabled={true}
               liteMode={true}
             >
-              <MapView.Marker key={station.id} coordinate={initialRegion} />
+              <MapView.Marker key={station.id} coordinate={initialRegion}>
+                <View style={styles.markerWrap}>
+                  <View style={styles.markerCenter}>
+                    <FontAwesome
+                      name="bolt"
+                      size={Platform.OS === 'ios' ? 10 : 11}
+                      style={styles.boltIcon}
+                      color="#26baee"
+                    />
+                  </View>
+                </View>
+              </MapView.Marker>
             </MapView>
-            <View style={{ height: 130 }}>
-              <View style={styles.detailWrapper}>
-                <Text style={styles.stationStatus}>{status}</Text>
-              </View>
-              <Button
-                title='Directions'
-                buttonStyle={styles.directionsButton}
-                onPress={() => this.gotoStation(street_address, city, state, zip_code)}
-                titleStyle={styles.buttonTitle}
-              />
+          </View>
+          <View style={{ height: 130, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={styles.detailWrapper}>
+              <Text style={styles.stationAddress}>{street_address}</Text>
+              <Text style={styles.stationAddress}>
+                {city}, {state} {zip_code}
+              </Text>
+              <Text style={styles.stationStatus}>{status}</Text>
             </View>
+            <Button
+              title="Directions"
+              buttonStyle={styles.directionsButton}
+              onPress={() => this.gotoStation(street_address, city, state, zip_code)}
+              titleStyle={styles.buttonTitle}
+            />
           </View>
         </Card>
       );
@@ -83,14 +107,15 @@ class SavedScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  cardStyle: {
-    justifyContent: 'center',
-    alignItems: 'center'
+  cardStyle: {},
+  mapViewStyle: {
+    flex: 1
   },
   detailWrapper: {
     marginVertical: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-around'
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignItems: 'center'
   },
   italics: {
     fontStyle: 'italic',
@@ -113,9 +138,40 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white'
   },
+  stationAddress: {
+    fontSize: 15
+  },
   stationStatus: {
     fontSize: 18,
     color: '#0CE89C'
+  },
+  markerWrap: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 16,
+    borderColor: '#26baee',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderWidth: 5,
+    width: 32,
+    height: 32,
+    transform: [{ rotate: '-45deg' }],
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    marginBottom: Platform.OS === 'ios' ? 0 : 12
+  },
+  markerCenter: {
+    width: 15,
+    height: 15,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: '#f47645',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  boltIcon: {
+    alignSelf: 'center',
+    transform: [{ rotate: '45deg' }]
   }
 });
 

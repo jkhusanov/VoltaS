@@ -10,8 +10,9 @@
   - [x] Add star or bookmark button for save
 - [x] Cluster markers
   - [x] Clusters render view change
-- [ ] Improve station info card on SavedScreen
-  - [ ] Maybe Show the address
+- [x] Improve station info card on SavedScreen
+  - [x] Show the address of a station
   - [ ] Maybe add individual station deletion option
-- [ ] Add custom markers image/view
+- [x] Add custom markers image/view
 - [ ] Implement directions provider and add it to AsyncStorage
+- [ ] Add current location button on MapScreen
