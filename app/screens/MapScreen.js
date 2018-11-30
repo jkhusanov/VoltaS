@@ -48,30 +48,47 @@ class MapScreen extends React.Component {
     this.loadStations();
   }
 
+  setRegion(region) {
+    if (this.state.ready) {
+      setTimeout(
+        () =>
+          this.map
+            .getMapRef()
+            .animateToRegion(this.regionFrom(region.latitude, region.longitude, 5500), 500),
+        10
+      );
+    }
+  }
+
+  onMapReady = () => {
+    if (!this.state.ready) {
+      this.setState({ ready: true });
+    }
+  };
+
   loadStations = () => {
     this.props.fetchStations(() => {
       // console.log(this.props.stations);
     });
   };
 
-  onRegionChangeComplete = region => {
-    this.setState({ region });
-  };
+  // onRegionChangeComplete = region => {
+  //   this.setState({ region });
+  // };
 
   getCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
       position => {
         if (position.coords.latitude && position.coords.longitude) {
-          this.setState({
-            region: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421
-            }
-          });
+          const region = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421
+          };
+          this.setRegion(region);
         }
-        this.setState({ isLoading: false, mapLoaded: true });
+        // this.setState({ isLoading: false, mapLoaded: true });
       },
       error => {
         console.log(error);
@@ -234,11 +251,6 @@ class MapScreen extends React.Component {
   clusteredMarkers() {
     const data = this._convertPoints(this.props.stations);
     const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
-    if (mapLoaded) {
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>;
-    }
     return (
       <View style={styles.container} style={{ flex: 1 }}>
         <ClusteredMapView
@@ -249,24 +261,28 @@ class MapScreen extends React.Component {
           initialRegion={region}
           // region={region}
           // onRegionChange={this.onRegionChangeComplete}
+          onMapReady={this.onMapReady}
+          ref={r => (this.map = r)}
           showsUserLocation={true}
-          showsMyLocationButton={true}
+          showsMyLocationButton={false}
           maxZoom={16}
+          animateClusters={false}
         />
         {this.stationInfoRender()}
+        <TouchableOpacity onPress={() => this.getCurrentLocation()} style={styles.myLocation}>
+          <FontAwesome
+            name="location-arrow"
+            size={Platform.OS === 'ios' ? 18 : 19}
+            style={styles.myLocationButton}
+            color="black"
+          />
+        </TouchableOpacity>
       </View>
     );
   }
   render() {
     const { isLoading } = this.state;
-    // return <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>;
-    return isLoading === true ? (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    ) : (
-      <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>
-    );
+    return <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>;
   }
 }
 const styles = StyleSheet.create({
@@ -347,19 +363,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center'
   },
-  controlBar: {
-    top: 24,
-    left: 25,
-    right: 25,
-    height: 40,
-    borderRadius: 20,
-    position: 'absolute',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: 'white',
-    justifyContent: 'space-between'
-  },
   clusterContainer: {
     width: 30,
     height: 30,
@@ -406,6 +409,22 @@ const styles = StyleSheet.create({
   boltIcon: {
     alignSelf: 'center',
     transform: [{ rotate: '45deg' }]
+  },
+  myLocation: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    height: 38,
+    width: 38,
+    borderRadius: 19,
+    right: 2.5,
+    top: 50,
+    alignItems: 'center',
+    borderWidth: 0.5,
+    borderColor: '#364f6b'
+  },
+  myLocationButton: {
+    transform: [{ rotate: '-45deg' }]
   }
 });
 
