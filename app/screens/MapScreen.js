@@ -48,13 +48,13 @@ class MapScreen extends React.Component {
     this.loadStations();
   }
 
-  setRegion(region) {
+  setRegion(region, distance = 5500) {
     if (this.state.ready) {
       setTimeout(
         () =>
           this.map
             .getMapRef()
-            .animateToRegion(this.regionFrom(region.latitude, region.longitude, 5500), 500),
+            .animateToRegion(this.regionFrom(region.latitude, region.longitude, distance), 500),
         10
       );
     }
@@ -150,6 +150,9 @@ class MapScreen extends React.Component {
             stationInfo: pin.value,
             isOpen: true
           });
+          if (Platform.OS === 'ios') {
+            this.setRegion(pin.location, 50);
+          }
         }}
       >
         <View style={styles.markerWrap}>
