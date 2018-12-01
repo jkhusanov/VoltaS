@@ -47,15 +47,7 @@ class SavedScreen extends React.Component {
       };
       return (
         <Card key={id} title={name} containerStyle={styles.cardStyle}>
-          <View
-            style={{
-              height: height / 4 + 10,
-              borderRadius: 10,
-              borderWidth: 0.5,
-              borderColor: 'white',
-              overflow: 'hidden'
-            }}
-          >
+          <View style={styles.mapViewStyle}>
             <MapView
               style={{ flex: 1 }}
               cacheEnabled={Platform.OS === 'ios'}
@@ -109,7 +101,11 @@ class SavedScreen extends React.Component {
 const styles = StyleSheet.create({
   cardStyle: {},
   mapViewStyle: {
-    flex: 1
+    height: height / 4 + 10,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    borderColor: 'white',
+    overflow: 'hidden'
   },
   detailWrapper: {
     marginVertical: 10,

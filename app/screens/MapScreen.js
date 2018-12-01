@@ -3,9 +3,7 @@ import {
   View,
   StyleSheet,
   Text,
-  ActivityIndicator,
   TouchableOpacity,
-  ScrollView,
   Dimensions,
   Platform,
   YellowBox
@@ -28,10 +26,6 @@ class MapScreen extends React.Component {
     headerTitle: 'VoltaS'
   });
   state = {
-    mapLoaded: false,
-    isLoading: true,
-    isModalVisible: false,
-    distance: 5000,
     stationInfo: '',
     isOpen: false,
     ready: true,
@@ -67,14 +61,8 @@ class MapScreen extends React.Component {
   };
 
   loadStations = () => {
-    this.props.fetchStations(() => {
-      // console.log(this.props.stations);
-    });
+    this.props.fetchStations(() => {});
   };
-
-  // onRegionChangeComplete = region => {
-  //   this.setState({ region });
-  // };
 
   getCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
@@ -88,7 +76,6 @@ class MapScreen extends React.Component {
           };
           this.setRegion(region);
         }
-        // this.setState({ isLoading: false, mapLoaded: true });
       },
       error => {
         console.log(error);
@@ -253,7 +240,7 @@ class MapScreen extends React.Component {
 
   clusteredMarkers() {
     const data = this._convertPoints(this.props.stations);
-    const { region, mapLoaded, isLoading, distance, stationInfo } = this.state;
+    const { region } = this.state;
     return (
       <View style={styles.container} style={{ flex: 1 }}>
         <ClusteredMapView
@@ -262,8 +249,6 @@ class MapScreen extends React.Component {
           renderMarker={this.renderMarker.bind(this)}
           renderCluster={this.renderCluster.bind(this)}
           initialRegion={region}
-          // region={region}
-          // onRegionChange={this.onRegionChangeComplete}
           onMapReady={this.onMapReady}
           ref={r => (this.map = r)}
           showsUserLocation={true}
@@ -284,7 +269,6 @@ class MapScreen extends React.Component {
     );
   }
   render() {
-    const { isLoading } = this.state;
     return <View style={{ flex: 1 }}>{this.clusteredMarkers()}</View>;
   }
 }

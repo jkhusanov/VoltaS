@@ -14,5 +14,4 @@
   - [x] Show the address of a station
   - [ ] Maybe add individual station deletion option
 - [x] Add custom markers image/view
-- [ ] Implement directions provider and add it to AsyncStorage
 - [x] Add current location button on MapScreen
