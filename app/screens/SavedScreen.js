@@ -1,10 +1,20 @@
 import React from 'react';
-import { View, Text, Platform, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Alert
+} from 'react-native';
 import { Button, Card } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { MapView } from 'expo';
 import openMap from 'react-native-open-maps';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as actions from '../actions';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,7 +23,7 @@ class SavedScreen extends React.Component {
     result: null
   };
   static navigationOptions = ({ navigation }) => ({
-    headerTitle: 'Saved Stations',
+    headerTitle: 'My Stations',
     headerRight: (
       <Button
         onPress={() => navigation.navigate('Settings')}
@@ -24,10 +34,7 @@ class SavedScreen extends React.Component {
         }}
         clear
       />
-    ),
-    headerStyle: {
-      // marginTop: Platform.OS === 'android' ?  Expo.Constants.statusBarHeight : 0
-    }
+    )
   });
 
   gotoStation = (street, city, state, zip) => {
@@ -35,6 +42,22 @@ class SavedScreen extends React.Component {
       travelType: ['drive'],
       end: `${street}, ${city}, ${state}, ${zip}`
     });
+  };
+  onRemoveButtonPress = id => {
+    Alert.alert(
+      'Warning',
+      'Are you sure you want to remove this station from your list?',
+      [
+        { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: () => {
+            this.props.removeSavedStation(id);
+          }
+        }
+      ],
+      { cancelable: false }
+    );
   };
   renderLikedJobs() {
     return this.props.savedStations.map(station => {
@@ -84,6 +107,12 @@ class SavedScreen extends React.Component {
               onPress={() => this.gotoStation(street_address, city, state, zip_code)}
               titleStyle={styles.buttonTitle}
             />
+            <TouchableOpacity
+              onPress={() => this.onRemoveButtonPress(id)}
+              style={styles.removeButton}
+            >
+              <FontAwesome name="bookmark" size={Platform.OS === 'ios' ? 24 : 25} color="#31343D" />
+            </TouchableOpacity>
           </View>
         </Card>
       );
@@ -168,6 +197,16 @@ const styles = StyleSheet.create({
   boltIcon: {
     alignSelf: 'center',
     transform: [{ rotate: '45deg' }]
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: 100
+  },
+  removeButton: {
+    position: 'absolute',
+    right: 0,
+    top: 10
   }
 });
 
@@ -175,4 +214,7 @@ function mapStateToProps(state) {
   return { savedStations: state.savedStations };
 }
 
-export default connect(mapStateToProps)(SavedScreen);
+export default connect(
+  mapStateToProps,
+  actions
+)(SavedScreen);

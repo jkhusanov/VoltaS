@@ -49,7 +49,7 @@ class MapScreen extends React.Component {
           this.map
             .getMapRef()
             .animateToRegion(this.regionFrom(region.latitude, region.longitude, distance), 500),
-        10
+        5
       );
     }
   }

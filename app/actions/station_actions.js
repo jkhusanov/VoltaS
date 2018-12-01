@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FETCH_STATIONS, SAVE_STATION, CLEAR_SAVED_STATIONS } from './types';
+import { FETCH_STATIONS, SAVE_STATION, CLEAR_SAVED_STATIONS, REMOVE_STATION } from './types';
 
 const STATIONS_ROOT_URL = 'https://api.voltaapi.com/v1/stations?status=a';
 
@@ -22,4 +22,11 @@ export const saveStation = station => {
 
 export const clearSavedStations = () => {
   return { type: CLEAR_SAVED_STATIONS };
+};
+
+export const removeSavedStation = station => {
+  return {
+    payload: station,
+    type: REMOVE_STATION
+  };
 };

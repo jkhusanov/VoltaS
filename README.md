@@ -12,6 +12,6 @@
   - [x] Clusters render view change
 - [x] Improve station info card on SavedScreen
   - [x] Show the address of a station
-  - [ ] Maybe add individual station deletion option
+  - [x] Add individual station deletion option
 - [x] Add custom markers image/view
 - [x] Add current location button on MapScreen
