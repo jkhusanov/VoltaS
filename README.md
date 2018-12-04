@@ -1,7 +1,5 @@
 # VoltaS
 
-My implementation of Volta Code Challenge
-
 <p align="center">
   <a href="https://github.com/jkhusanov/VoltaS">
     <img alt="VoltaS" src="assets/icon.png" width="250">
@@ -20,7 +18,7 @@ My implementation of Volta Code Challenge
 
 ## What's VoltaS?
 
-**Your best helper to fiend Volta stations**
+**Your best helper to find Volta stations**
 
 - Users can **discover stations around** using interactive map
 - Get **directions to stations**
